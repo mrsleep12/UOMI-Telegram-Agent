@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -14,17 +15,21 @@ jobs:
       - name: Install Rust (stable) + wasm target
         uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: stable
           targets: wasm32-unknown-unknown
 
-      - name: Build release WASM
+      - name: Install wasm-bindgen-cli
+        run: cargo install wasm-bindgen-cli
+
+      - name: Build for wasm
         run: cargo build --release --target wasm32-unknown-unknown
 
-      - name: List target folder
-        run: ls -R target/wasm32-unknown-unknown/release
+      - name: List build output
+        run: ls -lah target/wasm32-unknown-unknown/release
 
-      - name: Upload WASM
-        uses: actions/upload-artifact@v3
+      - name: Upload WASM artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: uomi-telegram-agent
-          path: target/wasm32-unknown-unknown/release/uomi-telegram-agent.wasm
+          name: wasm-build
+          path: target/wasm32-unknown-unknown/release/*.wasm
           
